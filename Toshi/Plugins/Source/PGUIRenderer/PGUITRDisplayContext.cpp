@@ -2,12 +2,15 @@
 #include "PGUIRenderer/PGUITRTextureFactory.h"
 #include "PGUIRenderer/PGUITRFontFactory.h"
 #include "TRender/TNullResource.h"
+#include "TRender/TRenderInterface.h"
 
 //-----------------------------------------------------------------------------
 // Enables memory debugging.
 // Note: Should be the last include!
 //-----------------------------------------------------------------------------
 #include <TKernel/TMemoryDebugOn.h>
+
+TOSHI_NAMESPACE_USING
 
 PGUITRDisplayContext::PGUITRDisplayContext()
 {
@@ -79,6 +82,17 @@ void PGUITRDisplayContext::PopAdditiveColour()
 // $PGUIRenderer: FUNCTION 100012e0
 void PGUITRDisplayContext::BeginScene()
 {
+	TRenderContext *pRenderContext = m_pRenderer->GetCurrentRenderContext();
+	TRenderContext::PROJECTIONPARAMS oProjectionParams;
+	oProjectionParams.m_oCentre.Set(0.0f, 0.0f);
+	oProjectionParams.m_oProj.Set(m_fScaleX, m_fScaleY);
+	oProjectionParams.m_fNearClip = -6553.5f;
+	oProjectionParams.m_fFarClip  = 0.0f;
+	pRenderContext->SetProjType(TRenderContext::PROJTYPE_ORTHOGRAPHIC);
+	pRenderContext->SetProjectionParameters(oProjectionParams);
+	pRenderContext->Update();
+	pRenderContext->SetModelViewMatrix(TMatrix44::IDENTITY);
+	TIMPLEMENT("Matrix stuff");
 	m_pShader->SetMaterial(TNULL);
 	m_pShader->BeginMeshGeneration();
 }

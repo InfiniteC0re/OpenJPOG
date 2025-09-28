@@ -27,12 +27,19 @@ public:
 		return *static_cast<TRenderD3DInterface *>(m_pRenderInterface);
 	}
 
+	const TMatrix44 &GetViewProjectionMatrix()
+	{
+		return m_oViewProjection;
+	}
+
 private:
 	void SetRenderMatrices()
 	{
-		//GetRenderer().GetD3DDevice()->SetTransform(D3DTS_VIEW, TREINTERPRETCAST(D3DMATRIX *, &TMatrix44::IDENTITY.m_f11));
-		//GetRenderer().GetD3DDevice()->SetTransform(D3DTS_PROJECTION, TREINTERPRETCAST(D3DMATRIX *, &m_Projection));
+		GetRenderer().GetD3DDevice()->SetTransform(D3DTS_VIEW, TREINTERPRETCAST(const D3DMATRIX *, &TMatrix44::IDENTITY));
+		GetRenderer().GetD3DDevice()->SetTransform(D3DTS_PROJECTION, TREINTERPRETCAST(D3DMATRIX *, &m_oViewProjection));
 	}
+
+	TMatrix44 m_oViewProjection; // 0x484
 };
 
 TOSHI_NAMESPACE_END

@@ -22,7 +22,7 @@ TRenderContext::TRenderContext(TRenderInterface &a_rRenderer)
 {
 	m_pRenderInterface = &a_rRenderer;
 	m_iFlags           = 1;
-	m_eCameraMode      = CameraMode_Perspective;
+	m_eProjType        = PROJTYPE_PERSPECTIVE;
 	TIMPLEMENT("TAtmoshere ...");
 	if (a_rRenderer.GetCurrentDevice() != TNULL) {
 		auto pDevice              = a_rRenderer.GetCurrentDevice();

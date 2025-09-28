@@ -48,10 +48,10 @@ public:
 		void SetFromFOV(TFLOAT a_fViewportWidth, TFLOAT a_fViewportHeight, TFLOAT a_fFOV, TFLOAT a_fNearPlane, TFLOAT a_fFarPlane);
 	};
 
-	enum CameraMode
+	enum PROJTYPE
 	{
-		CameraMode_Perspective,
-		CameraMode_Orthographic,
+		PROJTYPE_PERSPECTIVE,
+		PROJTYPE_ORTHOGRAPHIC,
 	};
 
 public:
@@ -89,10 +89,20 @@ public:
 	{
 		return m_oViewportParams;
 	}
+	void SetProjectionParameters(const PROJECTIONPARAMS &a_rProjectionParams)
+	{
+		m_oProjectionParams = a_rProjectionParams;
+		SetDirty(true);
+	}
 	// $TRenderInterface: FUNCTION 10008ec0
 	const PROJECTIONPARAMS &GetProjectionParameters() const
 	{
 		return m_oProjectionParams;
+	}
+	void SetProjType(PROJTYPE a_eProjType)
+	{
+		m_eProjType = a_eProjType;
+		SetDirty(true);
 	}
 	const TMatrix44 &GetModelViewMatrix() const
 	{
@@ -110,7 +120,7 @@ public:
 protected:
 	TRenderInterface *m_pRenderInterface;  // 0x4
 	FLAG              m_iFlags;            // 0x8
-	CameraMode        m_eCameraMode;       // 0x14
+	PROJTYPE          m_eProjType;         // 0x14
 	VIEWPORTPARAMS    m_oViewportParams;   // 0x18
 	PROJECTIONPARAMS  m_oProjectionParams; // 0x30
 	TMatrix44         m_oModelViewMatrix;  // 0x4C

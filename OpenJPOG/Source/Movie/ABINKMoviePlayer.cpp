@@ -158,9 +158,9 @@ TBOOL ABINKMoviePlayer::Render()
 	}
 	AGUISystem    *system  = AGUISystem::GetGUISystem();
 	TSpriteShader *pShader = system->GetShader();
-	TFLOAT         scaleY  = system->GetScreen()->GetHeight() / 448.0f;
-	TFLOAT         scaleX   = system->GetScreen()->GetWidth() / 640.0f;
-	pShader->SetColour(TGUIColour(0,0,0,0xFF));
+	TFLOAT         scaleY  = static_cast<TFLOAT>(system->GetScreen()->GetHeight()) / 448.0f;
+	TFLOAT         scaleX   = static_cast<TFLOAT>(system->GetScreen()->GetWidth()) / 640.0f;
+	pShader->SetColour(TGUIColour());
 	for (int i = 0; i < MAX_TILES; i++) {
 		pShader->SetMaterial(m_aRects[i].pMaterial);
 		pShader->RenderTriStrip(

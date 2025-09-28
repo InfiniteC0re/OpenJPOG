@@ -1,5 +1,6 @@
 #include "D3D/TSpriteShaderD3D.h"
 #include "TRenderD3D/TRenderD3DInterface.h"
+#include "TRenderD3D/TRenderContextD3D.h"
 #include "TRenderD3D/TD3DVertexFactoryResource.h"
 #include "TRenderD3D/TD3DIndexFactoryResource.h"
 
@@ -224,16 +225,17 @@ void TSpriteShaderHAL::Render(TRenderPacket *a_pRenderPacket)
 	}
 	TSpriteMaterialHAL *pMaterial = pMesh->GetMaterial();
 	pMaterial->PreRender();
+	TRenderContextD3D *pRenderContext = static_cast<TRenderContextD3D *>(GetRenderer()->GetCurrentRenderContext());
 	if (m_bVertexShaderSuccess) {
 		D3DXVECTOR4 vec4(1.0f, 1.0f, 1.0f, 1.0f);
 		pDevice->SetVertexShaderConstant(4, &vec4, 1);
-		D3DXMATRIX mat = reinterpret_cast<D3DXMATRIX &>(a_pRenderPacket->GetModelViewMatrix()) * reinterpret_cast<const D3DXMATRIX &>(GetRenderer()->GetCurrentRenderContext()->GetModelViewMatrix());
+		D3DXMATRIX         mat            = reinterpret_cast<D3DXMATRIX &>(a_pRenderPacket->GetModelViewMatrix()) * reinterpret_cast<const D3DXMATRIX &>(pRenderContext->GetViewProjectionMatrix());
 		pDevice->SetVertexShaderConstant(0, &mat, 4);
 	}
 	else {
 		static TMatrix44 oViewMatrix;
 		D3DXMATRIX mat;
-		reinterpret_cast<D3DXMATRIX &>(a_pRenderPacket->GetModelViewMatrix()) *= reinterpret_cast<const D3DXMATRIX &>(GetRenderer()->GetCurrentRenderContext()->GetModelViewMatrix());
+		reinterpret_cast<D3DXMATRIX &>(a_pRenderPacket->GetModelViewMatrix()) *= reinterpret_cast<const D3DXMATRIX &>(pRenderContext->GetViewProjectionMatrix());
 		pDevice->SetTransform(D3DTS_PROJECTION, &mat);
 		pDevice->SetTransform(D3DTS_WORLDMATRIX(0), reinterpret_cast<const D3DXMATRIX *>(&a_pRenderPacket->GetModelViewMatrix()));
 		pDevice->SetTransform(D3DTS_VIEW, reinterpret_cast<const D3DXMATRIX *>(&oViewMatrix));

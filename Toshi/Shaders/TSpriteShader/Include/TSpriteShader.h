@@ -152,7 +152,7 @@ public:
 
 
 	TSpriteShader()
-		: m_vPos1(1.0f, 1.0f), m_vPos2(1.0f, 1.0f)
+		: m_vPos1(1.0f, 1.0f), m_vPos2(1.0f, 1.0f), m_vUV1(0.0f, 0.0f), m_vUV2(0.0f, 0.0f)
 	{
 		m_bForceRender        = TFALSE;
 		m_pCurrentMesh        = TNULL;

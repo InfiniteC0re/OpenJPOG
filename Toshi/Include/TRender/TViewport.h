@@ -231,6 +231,11 @@ public:
 		return m_bIsEnabled;
 	}
 
+	TRenderContext *GetRenderContext()
+	{
+		return m_pRenderContext;
+	}
+
 private:
 	TRenderContext                       *m_pRenderContext;            // 0x34
 	TNodeList<THandler>                   m_aHandlers;                 // 0x38

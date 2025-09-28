@@ -180,7 +180,6 @@ void TSpriteShader::FUN_100019e0()
 	pMesh->m_vUV1 = m_vUV1;
 	pMesh->m_vUV2 = m_vUV2;
 	pMesh->Lock();
-	m_oModelViewMatrix.m_f14 = 5.0f;
 	GetRenderer()->GetCurrentRenderContext()->SetModelViewMatrix(m_oModelViewMatrix);
 }
 

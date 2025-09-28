@@ -74,8 +74,8 @@ TGUIScreen *PGUITRRenderObject::SetScreen(TGUIScreen* a_pScreen)
 	m_pScreen              = a_pScreen;
 	if (m_pViewport && a_pScreen) {
 		PGUITRDisplayContext *pDisplayContext = static_cast<PGUITRDisplayContext *>(m_pScreen->GetDisplayContext());
-		pDisplayContext->SetScaleX(m_pViewport->GetWidth() / m_pScreen->GetWidth());
-		pDisplayContext->SetScaleY(m_pViewport->GetHeight() / m_pScreen->GetHeight());
+		pDisplayContext->SetScaleX(m_pViewport->GetWidth() / static_cast<TFLOAT>(m_pScreen->GetWidth()));
+		pDisplayContext->SetScaleY(m_pViewport->GetHeight() / static_cast<TFLOAT>(m_pScreen->GetHeight()));
 	}
 	return pOldScreen;
 }
@@ -90,8 +90,8 @@ TViewport *PGUITRRenderObject::SetViewport(TViewport *a_pViewport)
 		m_oViewportHandler.ConnectEventHandlers();
 		if (m_pScreen) {
 			PGUITRDisplayContext *pDisplayContext = static_cast<PGUITRDisplayContext *>(m_pScreen->GetDisplayContext());
-			pDisplayContext->SetScaleX(m_pViewport->GetWidth() / m_pScreen->GetWidth());
-			pDisplayContext->SetScaleY(m_pViewport->GetHeight() / m_pScreen->GetHeight());
+			pDisplayContext->SetScaleX(m_pViewport->GetWidth() / static_cast<TFLOAT>(m_pScreen->GetWidth()));
+			pDisplayContext->SetScaleY(m_pViewport->GetHeight() / static_cast<TFLOAT>(m_pScreen->GetHeight()));
 		}
 	}
 	return a_pViewport;
