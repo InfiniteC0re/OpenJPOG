@@ -197,6 +197,7 @@ public:
 
 		};
 
+	protected:
 		TNode()
 		{
 			Reset();
@@ -206,7 +207,7 @@ public:
 		{
 		}
 
-	public:
+	protected:
 		// $TKernelInterface: FUNCTION 10007710
 		TNode *Next() const
 		{
@@ -263,7 +264,7 @@ public:
 		template <class T> friend class TPriList;
 		friend TGenericPriList;
 
-	private:
+	protected:
 		int m_iPriority;
 	};
 
@@ -409,10 +410,10 @@ public:
 			return m_pPtr;
 		}
 
-		operator TGenericPriList::TNode *() const
+		operator TNode *() const
 		{
 			TASSERT(m_pPtr != TNULL);
-			return (TGenericPriList::TNode *)m_pPtr;
+			return (TNode *)m_pPtr;
 		}
 
 		Iterator operator++(int)
@@ -449,8 +450,8 @@ public:
 	TBOOL    IsLinked() { return m_oRoot.IsLinked(); }
 	void     RemoveHead() { TGenericPriList::RemoveHead(); }
 	void     RemoveTail() { TGenericPriList::RemoveTail(); }
-	void     InsertHead(TNode *a_pNode) { TGenericPriList::InsertHead(a_pNode); }
-	void     InsertTail(TNode *a_pNode) { TGenericPriList::InsertTail(a_pNode); }
+	void     InsertHead(T *a_pNode) { TGenericPriList::InsertHead(a_pNode); }
+	void     InsertTail(T *a_pNode) { TGenericPriList::InsertTail(a_pNode); }
 };
 
 template <class T, int C = 0>
