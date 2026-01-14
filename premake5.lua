@@ -84,3 +84,7 @@ group "20-Plugin"
 
 group "30-Tools"
 	include "Tools/UnitTests"
+
+group "40-SDK"
+	include "SDK/JPOGSDK"
+	include "SDK/JPOGModCore"
