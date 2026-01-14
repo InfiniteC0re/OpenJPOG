@@ -114,6 +114,13 @@ MEMBER_HOOK(Interface::TRenderInterface + 0x9730, Toshi::TModel, TModel_LoadTMD,
 			strncpy(s_ModelBuffer, pchNameStart, pchExtStart - pchNameStart);
 			s_ModelBuffer[pchExtStart - pchNameStart] = '\0';
 
+			TINT iModelLength = strlen(s_ModelBuffer);
+			if (iModelLength >= 3
+				&& (strcmp(s_ModelBuffer + iModelLength - 3, "_lo") == 0 ||
+					strcmp(s_ModelBuffer + iModelLength - 3, "_md") == 0 ||
+					strcmp(s_ModelBuffer + iModelLength - 3, "_hi") == 0)
+				) s_ModelBuffer[iModelLength - 3] = '\0';
+
 			static TCHAR s_PathBuffer[MAX_PATH];
 			sprintf_s(s_PathBuffer, "Data\\matlibs\\%s.tml", s_ModelBuffer);
 
