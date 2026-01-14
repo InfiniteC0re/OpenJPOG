@@ -57,7 +57,7 @@ project "JPOGModCore"
 	
 	-- Modloader specific
 	debugdir ("%{wks.location}/../Game")
-	debugcommand ("%{wks.location}/../Game/SimJPModLoader.exe")
+	debugcommand ("%{wks.location}/../Game/JPMod.exe")
 	
 	postbuildcommands
 	{

@@ -71,11 +71,9 @@ DWORD APIENTRY DllMain(HMODULE hModule, DWORD reason, LPVOID reserved)
 			// Create kernel interface
 			g_pKernelInterface = new Toshi::TKernelInterface(0, NULL, TTRUE);
 
-#ifdef TOSHI_DEBUG
 			AllocConsole();
 			FILE *fDummy;
 			freopen_s(&fDummy, "CONOUT$", "w", stdout);
-#endif
 
 			// Initialise hooks
 			AHooks::Initialise();
