@@ -14,6 +14,7 @@ public:
 
 		};
 
+	protected:
 		TNode(TUnititialised) {}
 
 		TNode()
@@ -33,7 +34,7 @@ public:
 			return m_pPrev;
 		}
 
-	public:
+	protected:
 		// $TKernelInterface: FUNCTION 10007880
 		TNode &operator=(const TNode &a_rNode)
 		{
@@ -84,6 +85,7 @@ public:
 	public:
 		template <class T, int C> friend class TDList;
 		friend TGenericDList;
+		friend class TGenericPriList;
 
 	public:
 		TNode *m_pNext; // 0x0
@@ -329,6 +331,18 @@ template <class T>
 class TPriList : public TGenericPriList
 {
 public:
+	class TNode : public TGenericPriList::TNode
+	{
+	public:
+		T *Next() const { return TSTATICCAST(T *, m_pNext); }
+		T *Prev() const { return TSTATICCAST(T *, m_pPrev); }
+
+		TBOOL IsLinked() const { return this != m_pNext; }
+
+		void Remove() { TGenericPriList::TNode::Remove(); }
+	};
+
+public:
 	TPriList() {}
 
 	class Iterator
@@ -443,6 +457,21 @@ template <class T, int C = 0>
 class TDList : public TGenericDList
 {
 public:
+	class TNode : public TGenericDList::TNode
+	{
+	public:
+		T *Next() const { return TSTATICCAST(T*, m_pNext ); }
+		T *Prev() const { return TSTATICCAST(T *, m_pPrev); }
+
+		TBOOL IsLinked() const { return this != m_pNext; }
+
+		void InsertAfter(T *a_pNode) { TGenericDList::TNode::InsertAfter(a_pNode); }
+		void InsertBefore(T *a_pNode) { TGenericDList::TNode::InsertBefore(a_pNode); }
+
+		void Remove() { TGenericDList::TNode::Remove(); }
+	};
+
+public:
 	TDList() {}
 
 	class Iterator
@@ -544,6 +573,7 @@ public:
 	TBOOL    IsLinked() { return m_oRoot.IsLinked(); }
 	void     RemoveHead() { TGenericDList::RemoveHead(); }
 	void     RemoveTail() { TGenericDList::RemoveTail(); }
+	void     RemoveAll() { TGenericDList::RemoveAll(); }
 	void     InsertHead(TNode *a_pNode) { TGenericDList::InsertHead(a_pNode); }
 	void     InsertTail(TNode *a_pNode) { TGenericDList::InsertTail(a_pNode); }
 };
