@@ -8,6 +8,9 @@
 #include <JPOGSDK/Interface.h>
 #include <JPOGSDK/SDKHooks.h>
 
+#include <unordered_map>
+#include <string>
+
 TOSHI_NAMESPACE_USING
 
 static TBOOL s_bIsLoadingModel = TFALSE;
@@ -31,6 +34,55 @@ MEMBER_HOOK(Interface::TKernelInterface + 0xb360, Toshi::TModel, TFileManager_Cr
 	return CallOriginal(a_strName, a_uiMode);
 }
 
+static Toshi::TMaterialLibraryManager         *s_pMatLibManager; // TODO: replace with a value from TRenderInterface
+static std::unordered_map<std::string, void *> s_mapMatLibs;
+static std::unordered_map<void *, std::string> s_mapMatLibsNames;
+
+MEMBER_HOOK(Interface::TRenderInterface + 0xd980, Toshi::TMaterialLibraryManager, TMaterialLibraryManager_LoadMaterialLibrary, void *, const TCHAR *a_pchFileName)
+{
+	HooksPrint("[ModCore] TMaterialLibraryManager::LoadMaterialLibrary (file=%s)\n", a_pchFileName);
+
+	// HACK:
+	s_pMatLibManager = this;
+
+	auto it = s_mapMatLibs.find(a_pchFileName);
+	if (it == s_mapMatLibs.end())
+	{
+		void *pMatLib = CallOriginal(a_pchFileName);
+		if (pMatLib && pMatLib != (void *)-1)
+		{
+			s_mapMatLibs[a_pchFileName] = pMatLib;
+			s_mapMatLibsNames[pMatLib]  = a_pchFileName;
+		}
+		else
+		{
+			HooksPrint("[ModCore] Couldn't load requested TMaterialLibrary\n");
+		}
+
+		return pMatLib;
+	}
+
+	HooksPrint("[ModCore] Requested TMaterialLibrary already exists!!!\n", a_pchFileName);
+	return it->second;
+}
+
+MEMBER_HOOK(Interface::TRenderInterface + 0xd9f0, Toshi::TMaterialLibraryManager, TMaterialLibraryManager_UnloadMaterialLibrary, void, void *a_pMatLib)
+{
+	HooksPrint("[ModCore] TMaterialLibraryManager::UnloadMaterialLibrary (matlib=%p)\n", a_pMatLib);
+
+	// HACK:
+	s_pMatLibManager = this;
+
+	auto it = s_mapMatLibsNames.find(a_pMatLib);
+	if (it != s_mapMatLibsNames.end())
+	{
+		s_mapMatLibs.erase(it->second);
+		s_mapMatLibsNames.erase(a_pMatLib);
+	}
+
+	CallOriginal(a_pMatLib);
+}
+
 MEMBER_HOOK(Interface::TKernelInterface + 0x14c90, Toshi::TKernelInterface, TKernelInterface_LoadInterface, void *, const Toshi::TCString &a_strName)
 {
 	HooksPrint("[ModCore] TKernelInterface::LoadInterface (file=%s)\n", a_strName.GetString());
@@ -43,9 +95,31 @@ MEMBER_HOOK(Interface::TKernelInterface + 0x14c90, Toshi::TKernelInterface, TKer
 
 MEMBER_HOOK(Interface::TRenderInterface + 0x9730, Toshi::TModel, TModel_LoadTMD, TBOOL, const TCHAR *a_pchFileName)
 {
-	HooksPrint("[ModCore] Game loads TModel (name=%s)\n", a_pchFileName);
+	HooksPrint("[ModCore] TModel::LoadTMD (name=%s)\n", a_pchFileName);
 
 	s_bIsLoadingModel = TTRUE;
+
+	if (s_pMatLibManager)
+	{
+		// Try loading a material library for this model
+		static TCHAR s_ModelBuffer[128];
+
+		const TCHAR *pchNameStart = strrchr(a_pchFileName, '/') + 1;
+		if (!pchNameStart) pchNameStart = strrchr(a_pchFileName, '\\') + 1;
+		if (!pchNameStart) pchNameStart = a_pchFileName;
+
+		const TCHAR *pchExtStart = strrchr(a_pchFileName, '.');
+		if (pchNameStart && *pchNameStart && pchExtStart && *pchExtStart)
+		{
+			strncpy(s_ModelBuffer, pchNameStart, pchExtStart - pchNameStart);
+
+			static TCHAR s_PathBuffer[MAX_PATH];
+			sprintf_s(s_PathBuffer, "Data\\matlibs\\%s.tml", s_ModelBuffer);
+
+			((TMaterialLibraryManager_LoadMaterialLibrary::_hook_obj*)(s_pMatLibManager))->_hook_func(s_PathBuffer);
+		}
+	}
+
 	TBOOL bResult     = CallOriginal(a_pchFileName);
 	s_bIsLoadingModel = TFALSE;
 
@@ -64,7 +138,7 @@ MEMBER_HOOK(Interface::TRenderInterface + 0x6850, TKeyframeLibraryManager, TKeyf
 
 MEMBER_HOOK(Interface::TRenderInterface + 0x5850, TKeyframeLibraryManager, TKeyframeLibraryManager_GetLibrary, TKeyframeLibrary *, const TCHAR *a_pchKeyLibName)
 {
-	HooksPrint("[ModCore] Game requests TKeyframeLibrary (name=%s)\n", a_pchKeyLibName);
+	HooksPrint("[ModCore] TKeyframeLibraryManager::GetLibrary (name=%s)\n", a_pchKeyLibName);
 
 	TKeyframeLibrary *pResult = CallOriginal(a_pchKeyLibName);
 	if (pResult) return pResult;
@@ -84,6 +158,8 @@ MEMBER_HOOK(Interface::TRenderInterface + 0x5850, TKeyframeLibraryManager, TKeyf
 
 void AHooks::Initialise()
 {
+	InstallHook<TMaterialLibraryManager_LoadMaterialLibrary>();
+	InstallHook<TMaterialLibraryManager_UnloadMaterialLibrary>();
 	InstallHook<TKernelInterface_LoadInterface>();
 	InstallHook<TFileManager_CreateFile>();
 	InstallHook<TModel_LoadTMD>();
